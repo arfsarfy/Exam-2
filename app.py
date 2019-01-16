@@ -29,7 +29,7 @@ titanic_out.columns = result2[0].keys()
 app = dash.Dash(__name__)  # external_stylesheets=external_stylesheets
 server = app.server
 
-dataset={"titanic":titanic,"titanic_out":titanic_out}
+dataset_dict={'Titanic':titanic,'Titanic Outlier':titanic_out}
 
 def getPlot(df_pokemon,jenis,x_axis):
     list_gofunc={
@@ -65,7 +65,7 @@ def call3(df_pokemon,jenis_plot,x_axis):
 app.title = 'Dashboard Titanic'
 app.layout = html.Div(children= [ 
                 html.H1(children = 'Dashboard Titanic',className='titleDashboard'),
-                dcc.Tabs(id="tabs", value='tab-4', children=[                                                                 #TABS HEAD
+                dcc.Tabs(id="tabs", value='tab-2', children=[                                                                 #TABS HEAD
                     dcc.Tab(label='Titanic Dataset', value='tab-1', children=[                                                #TAB 1
                         html.Div([                                                              
                             html.H1('Table Data Titanic',className='h1_x'),
@@ -75,8 +75,8 @@ app.layout = html.Div(children= [
                                         html.P('Dataset :'),
                                         dcc.Dropdown(
                                                 id='dataset',
-                                                options=[{'label': i, 'value': i} for i in list(dataset.keys())],
-                                                value='titanic',
+                                                options=[{'label': i, 'value': i} for i in list(dataset_dict.keys())],
+                                                value='Titanic',
                                                 # style={'width':'300px'}
                                                     )
                                             ]
@@ -159,13 +159,13 @@ def update_graphCategorical(jenis_plot,x_axis):
     [Input(component_id='dataset', component_property='value')])
 
 def update_PieChart(ds):
-    return go.Table(
-                        header=dict(values=list(dataset[ds].columns),
+    return {'data':[go.Table(
+                        header=dict(values=list(dataset_dict[ds].columns),
                                     fill = dict(color='#C2D4FF'),
                                     align = ['left'] * 5),
-                        cells=dict(values=[dataset[ds].values ],
+                        cells=dict(values=list(dataset_dict[ds][item].values for item in dataset_dict[ds].columns),
                                 fill = dict(color='#F5F8FF'),
-                                align = ['left'] * 5))
+                                align = ['left'] * 5))]}
 
 
 
