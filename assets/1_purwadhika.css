@@ -1,0 +1,29 @@
+.titleDashboard{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', 'sans-serif';
+    font-size: 45px;
+    text-align: center;
+
+}
+
+.h1_x{
+    text-align: center;
+    color:#008080;
+}
+.text_modified{
+    text-align: center;
+    color:black;
+}
+
+table,th,td {
+    border : 2px solid black;
+    border-collapse:collapse;
+    font-size: 1.2rem;
+    margin: 0 auto;
+    padding: 5px 10px; /* top&bottom 5px, right&left 10px*/
+    text-align:center;
+}
+
+.title{
+    text-align: center;
+    color:#008080;
+}
