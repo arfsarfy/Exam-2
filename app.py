@@ -8,21 +8,30 @@ import plotly.graph_objs as go
 # import pandas as pd
 from plotly import tools
 from dash.dependencies import Input, Output
+from sqlalchemy import create_engine
+
+
+engine = create_engine('mysql+mysqlconnector://root:191096@localhost/titanic?host=localhost?port3306')
+conn = engine.connect()
 
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-titanic = pd.read_csv('Titanic.csv')
-titani_out= pd.read_csv('TitanicOutCalc.csv')
+result = conn.execute("SELECT * from titanic").fetchall()
+titanic = pd.DataFrame(result)
+titanic.columns = result[0].keys()
+result2 = conn.execute("SELECT * from titanicoutcalc").fetchall()
+titanic_out= pd.DataFrame(result2)
+titanic_out.columns = result2[0].keys()
 
 
 
 app = dash.Dash(__name__)  # external_stylesheets=external_stylesheets
 server = app.server
 
-dataset={"titanic":titanic,"titani_out":titani_out}
+dataset={"titanic":titanic,"titanic_out":titanic_out}
 
-def getPlot(df_pokemon,jenis,x_axis,y_axis):
+def getPlot(df_pokemon,jenis,x_axis):
     list_gofunc={
     'bar':go.Bar,
     'violin':go.Violin,
@@ -38,7 +47,7 @@ def getPlot(df_pokemon,jenis,x_axis,y_axis):
 
 
 
-def call3(df_pokemon,jenis_plot,x_axis,go):
+def call3(df_pokemon,jenis_plot,x_axis):
     return {'data':getPlot(df_pokemon,jenis_plot,x_axis),
         'layout':go.Layout(
         xaxis=dict(title=x_axis), yaxis=dict(title='fare'),
@@ -61,9 +70,9 @@ app.layout = html.Div(children= [
                         html.Div([                                                              
                             html.H1('Table Data Titanic',className='h1_x'),
                             html.Br(),
-                            html.Div(className='row justify-content-md-center', children=[
+                            html.Div(className='row ', children=[
                                 html.Div(className='col-sm-4',children=[
-                                        html.P('dataset :',className='text_modified'),
+                                        html.P('Dataset :'),
                                         dcc.Dropdown(
                                                 id='dataset',
                                                 options=[{'label': i, 'value': i} for i in list(dataset.keys())],
@@ -82,9 +91,9 @@ app.layout = html.Div(children= [
                     dcc.Tab(label='Categorical Plot', value='tab-2', children=[                                                   #TAB 2
                         html.Div([                                                          
                                     html.H1('Category Plot Titanic',className='h1_x'),
-                                    html.Div('Plot Type',className='text_modified'),
-                                    html.Div(className='row justify-content-md-center', children=[
-                                        html.Div(className='col-6',children=[
+                                    html.Div('Plot Type'),
+                                    html.Div(className='row', children=[
+                                        html.Div(className='col-4',children=[
                                             dcc.Dropdown(
                                                     id='jenisPlot',
                                                     options=[{'label': i, 'value': i.lower()} for i in ['Bar','Box','Violin']],
@@ -96,13 +105,13 @@ app.layout = html.Div(children= [
                                         )
                                         ]),
                                     html.Br(),
-                                    html.Div(className='row justify-content-md-center', children=[
-                                        html.Div('x-Axis   ',className='col-md-auto'),
-                                        html.Div(className='col col-lg-2',children=[
+                                    html.Div('x-Axis'),
+                                    html.Div(className='row', children=[
+                                        html.Div(className='col-4',children=[
                                             dcc.Dropdown(
                                                     id='x_axis',
                                                     options=[{'label': i, 'value': i} for i in titanic.columns],
-                                                    value='survived',
+                                                    value='sex',
                                                     # style={'width':'300px'}
                                                         )],
                                         # style={'margin':'0 auto'}
@@ -142,7 +151,7 @@ app.layout = html.Div(children= [
     Input(component_id='x_axis', component_property='value')])
 
 def update_graphCategorical(jenis_plot,x_axis):
-    return call3(titanic,jenis_plot,x_axis,go)
+    return call3(titanic,jenis_plot,x_axis)
 
 
 @app.callback(
@@ -154,7 +163,7 @@ def update_PieChart(ds):
                         header=dict(values=list(dataset[ds].columns),
                                     fill = dict(color='#C2D4FF'),
                                     align = ['left'] * 5),
-                        cells=dict(values=[df.Rank, df.State, df.Postal, df.Population],
+                        cells=dict(values=[dataset[ds].values ],
                                 fill = dict(color='#F5F8FF'),
                                 align = ['left'] * 5))
 
